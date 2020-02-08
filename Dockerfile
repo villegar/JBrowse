@@ -8,26 +8,22 @@ LABEL name="JBrowse" \
 
 # Update the image to the latest packages
 RUN apt-get update && apt-get upgrade -y
-RUN apt-get install build-essential zlib1g-dev -y
-RUN apt-get install curl zip libgconf-2-4 git -y
-RUN apt-get install libgconf-2-4 -y
+RUN apt-get install build-essential zlib1g-dev libgd-dev libpng-dev -y
+RUN apt-get install libgconf-2-4 git -y
+RUN apt-get install node.js npm -y
 
 # Install NGINX to test.
 RUN apt-get install nginx -y
 
-# Expose port 80
-EXPOSE 80
+# Expose port 8082
+EXPOSE 8082
 
 # Download latest version from the repository
 RUN git clone https://github.com/gmod/jbrowse
-RUN cd jbrowse
+WORKDIR jbrowse
 RUN git checkout $(git describe --tags)
 RUN ./setup.sh
 
-RUN mkdir -p /var/www/html/
-RUN mkdir -p /usr/share/nginx/html/
-RUN ln -sf ../jbrowse /var/www/html/jbrowse
-RUN ln -sf ../jbrowse /usr/share/nginx/html/
-
 # Last is the actual command to start up NGINX within our Container
-CMD ["nginx", "-g", "daemon off;"]
+#CMD ["nginx", "-g", "daemon off;"]
+CMD npm run start
